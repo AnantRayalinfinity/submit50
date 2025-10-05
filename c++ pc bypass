@@ -1,0 +1,1387 @@
+#include "main.h"
+#include "SmartyMem.h"
+
+#include <tchar.h>
+#include <dwmapi.h>
+#include "auth/auth.hpp"
+#include <thread>
+#pragma comment(lib, "Dwmapi.lib")
+#include <ShObjIdl_core.h>
+#include "image.h"
+
+
+namespace texture
+{
+    ID3D11ShaderResourceView* esp_preview = nullptr;
+    ID3D11ShaderResourceView* avatumxd = nullptr;
+
+
+}
+
+
+
+
+
+
+
+
+
+static int dnd_counter = 0;
+
+static bool checkbox[25];
+static int slider_int = false;
+
+const char* themes[]{ "Head","Chest", "Legs", "Hands" };
+
+const char* auto_stop[]{ "Betwen shots", "Force accuracy", "Power accuracy", "Auto sleep" };
+
+static int combo;
+
+static int keybind;
+
+static int iTabs;
+static int menu_state;
+
+static bool holaaa = false;
+
+
+
+static float text_animation = 0.00f;
+static float loader_animation = 0.f;
+static bool text_animation_hide = true;
+float color_edit[4];
+
+
+
+
+
+
+std::string MemoryLogs = " Status!";
+using namespace KeyAuth;
+
+
+// copy and paste from https://keyauth.cc/app/ and replace these string variables
+// Please watch tutorial HERE https://www.youtube.com/watch?v=5x4YkTmFH-U
+std::string name = skCrypt("LUXURY").decrypt(); // App name
+std::string ownerid = skCrypt("HqW2LKMSXm").decrypt(); // Account ID
+std::string version = skCrypt("1.1").decrypt(); // Application version. Used for automatic downloads see video here https://www.youtube.com/watch?v=kW195PLCBKs
+std::string url = skCrypt("https://keyauth.win/api/1.3/").decrypt(); // change if using KeyAuth custom domains feature
+std::string path = skCrypt("").decrypt(); // (OPTIONAL) see tutorial here https://www.youtube.com/watch?v=I9rxt821gMk&t=1s
+
+
+api KeyAuthApp(name, ownerid, version, url, path);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+extern "C" {
+    NTSTATUS NTAPI NtSuspendProcess(HANDLE ProcessHandle);
+    NTSTATUS NTAPI NtResumeProcess(HANDLE ProcessHandle);
+}
+
+
+bool isProcessFrozen = false;
+bool prevKey1g = false;
+bool prevKey2g = false;
+bool prevKey3g = false;
+
+bool hotkeypressed1 = false;
+bool hotkeypressed2 = false;
+bool hotkeypressed3 = false;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+namespace var
+{
+    
+
+   
+
+    //others
+    bool resetquest;
+    bool stopinternet;
+    bool streamermode;
+    bool pinontop;
+
+}
+
+
+bool sg, internet, xd, xd1, xd2;
+
+int key1, key2, key3;
+namespace rafa {
+    bool internet;
+
+}
+
+
+struct c_bytes
+{
+    std::vector<DWORD_PTR> cameraleft;
+    
+};  c_bytes bytes;
+
+
+int cameraleftkey1;
+static int cameraleftkey;
+
+
+
+
+
+
+
+/// <summary>
+/// ///////////////////////////////////////////////////////////////////////////////
+/// </summary>
+///
+///
+/// 
+void DoWork1()
+{
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+namespace pic
+{
+
+    ID3D11ShaderResourceView* aimbot = nullptr;
+    ID3D11ShaderResourceView* visuals = nullptr;
+    ID3D11ShaderResourceView* skins = nullptr;
+    ID3D11ShaderResourceView* settings = nullptr;
+
+    ID3D11ShaderResourceView* combo_widget = nullptr;
+    ID3D11ShaderResourceView* input_widget = nullptr;
+
+    ID3D11ShaderResourceView* menu_settings_icon = nullptr;
+
+    ID3D11ShaderResourceView* circle_success = nullptr;
+    ID3D11ShaderResourceView* circle_error = nullptr;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+DWORD WINAPI DoWork1(LPVOID lpParam)
+{
+    // This function will be executed in a separate thread
+
+    // Your work here
+    for (int i = 0; i < 10; ++i) {
+        // Do some work, such as printing numbers
+        std::cout << "Working in Thread 1: " << i << std::endl;
+        Sleep(1000); // Simulate work by sleeping for 1 second
+    }
+
+    // When the work is done, you can return
+    return 0;
+}
+
+bool DownloadFile(const std::string& DownloadLink, const std::string& SaveLocation)
+{
+    std::string command = "curl.exe --url \"" + DownloadLink + "\" --output \"" + SaveLocation + "\"";
+    int result = system(command.c_str());
+    if (result == 0) {
+        std::cout << "File downloaded successfully." << std::endl;
+        return true;
+    }
+    else {
+        std::cerr << "Failed to download file. Curl returned error code: " << result << std::endl;
+        return false;
+    }
+}
+
+DWORD GetProcId(const char* procName)
+{
+    DWORD procId = 0;
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnap != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32 procEntry;
+        procEntry.dwSize = sizeof(procEntry);
+        if (Process32First(hSnap, &procEntry)) {
+            do {
+                if (!_stricmp(procEntry.szExeFile, procName)) {
+                    procId = procEntry.th32ProcessID;
+                    break;
+                }
+            } while (Process32Next(hSnap, &procEntry));
+        }
+    }
+    CloseHandle(hSnap);
+    return procId;
+}
+
+bool InjectDLL(const char* targetProcessName, const char* dllPath)
+{
+    // Find the process alvo hair name
+    PROCESSENTRY32 processEntry;
+    processEntry.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+
+        MemoryLogs = "Error in creating the snapshot of the process";
+        return false;
+    }
+
+    HANDLE hProcess = nullptr;
+    if (Process32First(hSnapshot, &processEntry)) {
+        do {
+            if (_stricmp(processEntry.szExeFile, targetProcessName) == 0) {
+                hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID);
+                break;
+            }
+        } while (Process32Next(hSnapshot, &processEntry));
+    }
+
+    CloseHandle(hSnapshot);
+
+    if (hProcess == nullptr)
+    {
+
+        MemoryLogs = "Emulator Not Found";
+        return false;
+    }
+
+
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, nullptr, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    if (pRemoteMemory == nullptr)
+    {
+
+        MemoryLogs = "Error Allocating Remote Memory";
+        CloseHandle(hProcess);
+        return false;
+    }
+
+
+    WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, nullptr);
+
+
+    HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)LoadLibraryA, pRemoteMemory, 0, nullptr);
+    if (hThread == nullptr)
+    {
+
+        MemoryLogs = "Error raising remote thread";
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return false;
+    }
+
+
+    WaitForSingleObject(hThread, INFINITE);
+
+
+    CloseHandle(hThread);
+    VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+    CloseHandle(hProcess);
+
+    MemoryLogs = "DLL Injected Successfully";
+
+    return true;
+}
+
+
+
+bool EjectDLL(const char* targetProcessName, const char* dllPath) {
+
+    PROCESSENTRY32 processEntry;
+    processEntry.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+
+        MemoryLogs = "Error in creating the snapshot of the process";
+        return false;
+    }
+
+    HANDLE hProcess = nullptr;
+    if (Process32First(hSnapshot, &processEntry))
+    {
+        do {
+            if (_stricmp(processEntry.szExeFile, targetProcessName) == 0)
+            {
+                hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID);
+                break;
+            }
+        } while (Process32Next(hSnapshot, &processEntry));
+    }
+
+    CloseHandle(hSnapshot);
+
+    if (hProcess == nullptr)
+    {
+        MemoryLogs = "Emulator Not Found";
+        return false;
+    }
+
+
+    HMODULE hModule = GetModuleHandleA(dllPath);
+    if (hModule == nullptr)
+    {
+
+        MemoryLogs = "Error in obtaining the identifier of the DLL module";
+        CloseHandle(hProcess);
+        return false;
+    }
+
+    // Obtain the correctness of the FreeLibrary function
+    FARPROC pFreeLibrary = GetProcAddress(GetModuleHandleA("kernel32.dll"), "FreeLibrary");
+    if (pFreeLibrary == nullptr) {
+
+        MemoryLogs = "FreeLibrary get or right error";
+        CloseHandle(hProcess);
+        return false;
+    }
+
+
+    HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)pFreeLibrary, hModule, 0, nullptr);
+    if (hThread == nullptr)
+    {
+
+        MemoryLogs = "Error raising remote thread";
+        CloseHandle(hProcess);
+        return false;
+    }
+
+
+    WaitForSingleObject(hThread, INFINITE);
+
+    // Clear resources
+    CloseHandle(hThread);
+    CloseHandle(hProcess);
+
+    MemoryLogs = "DLL removed with success!";
+
+    return true;
+}
+HANDLE mutex;
+
+void SmartySecurity()
+{
+    // Wait for the mutex to ensure main thread finishes first
+    WaitForSingleObject(mutex, INFINITE);
+
+    HWND Stealth;
+    AllocConsole();
+    Stealth = FindWindowA("ConsoleWindowClass", NULL);
+    ShowWindow(Stealth, 0);
+
+    // Release the mutex to allow other threads to proceed
+    ReleaseMutex(mutex);
+}
+
+
+char login[64];
+char password[64];
+char lisence[64];
+
+
+void SmartyConsoleDetector()
+{
+    HWND Stealth;
+    AllocConsole();
+    Stealth = FindWindowA("ConsoleWindowClass", NULL);
+    Stealth = FindWindowA("Console Window Host", NULL);
+    ShowWindow(Stealth, 0);
+}
+
+void Smarty_CONSOLE()
+{
+    HWND Stealth;
+    AllocConsole();
+    Stealth = FindWindowA("ConsoleWindowClass", NULL);
+    ShowWindow(Stealth, 0);
+}
+
+
+int Getid(const char* procnname) {
+
+    if (procnname == NULL)
+        return 0;
+    DWORD pid = 0;
+    DWORD threadCount = 0;
+
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 pe;
+
+    pe.dwSize = sizeof(PROCESSENTRY32);
+    Process32First(hSnap, &pe);
+    while (Process32Next(hSnap, &pe)) {
+        if (_tcsicmp(pe.szExeFile, procnname) == 0) {
+            if ((int)pe.cntThreads > threadCount) {
+                threadCount = pe.cntThreads;
+
+                pid = pe.th32ProcessID;
+
+            }
+        }
+    }
+    return pid;
+}
+
+
+
+
+int APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+    FileDetector();
+    std::thread(AntiDebug::AntiDebugLoop).detach();
+    SmartyAntiCrackSystem->nignog();
+
+    {
+        HRESULT hr; //sonido
+        char url[] = "https://raw.githubusercontent.com/yassine12345-UI/uy/main/0704.WAV";
+        char local[] = "C:\\Windows\\0704.wav";
+        hr = URLDownloadToFile(NULL, url, local, 0, NULL);
+    }
+
+    {
+        HRESULT hr; //sonido
+        char url[] = "https://raw.githubusercontent.com/ziitx/WAV/main/ACTIVADA.wav";
+        char local[] = "C:\\Windows\\ACTIVADA.wav";
+        hr = URLDownloadToFile(NULL, url, local, 0, NULL);
+    }
+
+
+
+    // SECURITY //
+
+    //FileDetector();
+    //CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)SmartyConsoleDetector, nullptr, NULL, nullptr);
+
+
+   
+
+    mutex = CreateMutex(NULL, FALSE, NULL);
+    if (mutex == NULL)
+    {
+        notificationSystem.Notification("Notification:", " Failed to create mutex. Error code ", c::accent_color);
+        std::cerr << "Failed to create mutex. Error code: " << GetLastError() << std::endl;
+        return 1;
+    }
+
+
+
+    CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)SmartySecurity, nullptr, NULL, nullptr);
+    HANDLE thread = CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)SmartySecurity, nullptr, NULL, nullptr);
+
+    if (thread == NULL)
+    {
+
+        std::cerr << "Notification:. Error code: " << GetLastError() << std::endl;
+        CloseHandle(mutex);
+        return 1;
+    }
+
+
+    WaitForSingleObject(thread, INFINITE);
+
+
+    CloseHandle(thread);
+
+    CloseHandle(mutex);
+
+
+    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)DoWork1, NULL, 0, NULL);
+
+    KeyAuthApp.init();
+    WNDCLASSEXW wc;
+    wc.cbSize = sizeof(WNDCLASSEXW);
+    wc.style = CS_CLASSDC;
+    wc.lpfnWndProc = WndProc;
+    wc.cbClsExtra = NULL;
+    wc.cbWndExtra = NULL;
+    wc.hInstance = nullptr;
+    wc.hIcon = LoadIcon(0, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(0, IDC_ARROW);
+    wc.hbrBackground = nullptr;
+    wc.lpszMenuName = L"Example";
+    wc.lpszClassName = L"BACK CHEAT'S";
+    wc.hIconSm = LoadIcon(0, IDI_APPLICATION);
+
+    RegisterClassExW(&wc);
+    hwnd = CreateWindowExW(NULL, wc.lpszClassName, L"Example", WS_POPUP, (GetSystemMetrics(SM_CXSCREEN) / 2) - (menu_size.x / 2), (GetSystemMetrics(SM_CYSCREEN) / 2) - (menu_size.y / 2), menu_size.x, menu_size.y, 0, 0, 0, 0);
+
+    SetWindowLongA(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+    SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
+
+    MARGINS margins = { -1 };
+    DwmExtendFrameIntoClientArea(hwnd, &margins);
+
+    SetWindowRgn(hwnd, CreateRoundRectRgn(0, 0, menu_size.x, menu_size.y, 10, 10), TRUE); // Ñîçäàíèå ñêðóãëåííûõ óãëîâ
+
+
+    POINT mouse;
+    rc = { 0 };
+    GetWindowRect(hwnd, &rc);
+
+    if (!CreateDeviceD3D(hwnd))
+    {
+        CleanupDeviceD3D();
+        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+        return 1;
+    }
+
+    ::ShowWindow(hwnd, SW_SHOWDEFAULT);
+    ::UpdateWindow(hwnd);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    io.Fonts->AddFontFromMemoryTTF(&PoppinsRegular, sizeof PoppinsRegular, 22, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+    
+    status_font = io.Fonts->AddFontFromMemoryTTF(&PoppinsRegular, sizeof PoppinsRegular, 24, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+    second_font = io.Fonts->AddFontFromMemoryTTF(&PoppinsRegular, sizeof PoppinsRegular, 18, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+    icon_font = io.Fonts->AddFontFromMemoryTTF(&icomoon, sizeof icomoon, 20, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+    bold_font = io.Fonts->AddFontFromMemoryTTF(&Nevan, sizeof Nevan, 22, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+
+    ImGui::StyleColorsDark();
+    
+    if (pic::input_widget == nullptr) D3DX11CreateShaderResourceViewFromMemory(g_pd3dDevice, input_widget, sizeof(input_widget), &info, pump, &pic::input_widget, 0);
+    if (pic::combo_widget == nullptr) D3DX11CreateShaderResourceViewFromMemory(g_pd3dDevice, combo_widget, sizeof(combo_widget), &info, pump, &pic::combo_widget, 0);
+
+    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+
+    ImVec4 clear_color = ImVec4(0.6f, 0.6f, 0.6f, 1.00f);
+
+    ImGuiStyle& s = ImGui::GetStyle();
+
+    s.FramePadding = ImVec2(5, 3);
+    s.WindowPadding = ImVec2(0, 0);
+    s.FrameRounding = 9.f;//1
+    s.WindowRounding = 20.f;//2
+    s.WindowBorderSize = 0.f;
+    s.PopupBorderSize = 0.f;
+    s.WindowPadding = ImVec2(0, 0);
+    s.ChildBorderSize = 10;
+    s.WindowShadowSize = 0;
+
+    bool done = false;
+    while (!done)
+    {
+        MSG msg;
+        while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        {
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
+                done = true;
+        }
+        if (done)
+            break;
+        if (GetAsyncKeyState(VK_DELETE) & 1)
+        {
+            exit(0);
+        }
+
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+        {
+
+            ImGui::SetNextWindowPos(ImVec2(0, 0));
+            ImGui::SetNextWindowSize(ImVec2(425, 540));
+            ImGui::Begin("General", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus);
+            {
+
+
+
+                main_window = ImGui::GetCurrentWindow();
+                auto draw = ImGui::GetWindowDrawList();
+                const auto& p = ImGui::GetWindowPos();
+
+
+
+                
+
+               
+            
+        /////////BORDER  MECANISM !!!!         ///////////////////////////////
+
+
+
+
+                ImGui::GetForegroundDrawList()->AddRect
+                (
+                    ImVec2(1 + p.x, 1 + p.y),      // Top-left corner
+                    ImVec2(406 + p.x, 499 + p.y),  // Bottom-right corner
+                    ImColor(main_color),           // Color of the border
+                    6,                             // Rounding radius for the corners
+                    ImDrawFlags_None,              // Flags for additional styles (e.g., dash lines)
+                    1.5f                           // Border thickness
+                );
+
+                    
+                    
+
+               
+
+
+
+
+
+
+                    
+
+                
+
+               
+
+         /////////////ENDD !!!! ///////////////////////////////////////////
+
+                draw->AddRectFilled(p, p + menu_size, ImColor(0.03f, 0.03f, 0.03f, 0.4f), 2.f);
+
+                if (menu_state == 1)
+                {
+
+                    draw->AddRectFilled(p, p + ImVec2(755, 50), background_color, 2.f, ImDrawFlags_RoundCornersTop);
+                    draw->AddRectFilled(p, p + ImVec2(70, 755), background_color, 2.f, ImDrawFlags_RoundCornersTop);
+                    draw->AddRectFilled(p + ImVec2(0, 50), p + ImVec2(755, 52), second_color);
+                    draw->AddRectFilled(p + ImVec2(70, 55), p + ImVec2(72, 755), second_color);
+
+                    draw->AddRectFilled(p, p + ImVec2(755, 550), background_color, 2.f, ImDrawFlags_RoundCornersTop);
+                    draw->AddRectFilled(p, p + ImVec2(755, 550), background_color, 2.f, ImDrawFlags_RoundCornersLeft);
+                    draw->AddImage(logotype_pic, p + ImVec2(7, 5), p + ImVec2(15, 30), ImVec2(0, 0), ImVec2(1, 1), ImColor(1.f, 1.f, 1.f, 1.f));
+
+                    ImGui::SetCursorPos(ImVec2(355, 5));
+
+
+
+                    if (!loader_animation)
+                        loader_animation = GetTickCount();
+                    if (GetTickCount() > loader_animation + (1 * 15))
+                    {
+
+                        if (text_animation_hide)
+                        {
+
+                            if (text_animation < 0.80f)
+                                text_animation += 0.04f / ImGui::GetIO().Framerate * 60.f;
+                            if (text_animation >= 0.80f)
+                                text_animation_hide = false;
+                        }
+
+                        else
+                        {
+                            if (text_animation > 0.00f)
+                                text_animation -= 0.04f / ImGui::GetIO().Framerate * 60.f;
+                            if (text_animation <= 0.00f)
+                                text_animation_hide = true;
+
+                        }
+                        loader_animation = 0;
+                    }
+                    ImU32 tt_color = ImGui::ColorConvertFloat4ToU32(ImVec4(main_color));
+                    const auto& CurrentWindowPos = ImGui::GetWindowPos();
+                    const auto& pWindowDrawList = ImGui::GetWindowDrawList();
+                    const auto& pForegroundDrawList = ImGui::GetForegroundDrawList();
+
+                    ImU32 tet_shadow = ImGui::ColorConvertFloat4ToU32(ImVec4(main_color));
+                    ImU32 tet_color = ImGui::ColorConvertFloat4ToU32(ImVec4(x_color));
+                    
+                    ImVec2 position(65, 25);
+                    ImGui::SetCursorPos(ImVec2((f::bg::size.x / 2) - 140 / 2 + position.x, (f::bg::size.y / 2) - 38 / 2 + position.y));
+                    ImGui::PushFont(bold_font);
+                    ImGui::ShadowText("SAGOR X ", ImGui::GetColorU32(tet_shadow), ImGui::GetColorU32(tet_shadow), 60.f, ImVec2((313 / 2 - (ImGui::CalcTextSize("SAGOR X ").x) / 2), 15));
+                    ImGui::PopFont();
+
+                    ImGui::SetCursorPos(ImVec2((f::bg::size.x / 2) - 140 / 2 + position.x, (f::bg::size.y / 2) - 38 / 2 + position.y));
+                    ImGui::PushFont(bold_font);
+                    ImGui::ShadowText("CHEAT'S", ImGui::GetColorU32(tet_color), ImGui::GetColorU32(tet_color), 60.f, ImVec2((597 / 2 - (ImGui::CalcTextSize("CHEAT'S").x) / 2), 15));
+                    ImGui::PopFont();
+
+                    ImGui::PushFont(bold_font);
+                    ImVec4 animated_color = ImVec4(170, 0, 255, text_animation);
+                    ImGui::PopFont();
+
+
+                    
+                    ImGui::PushFont(status_font);
+                    ImGui::SetCursorPos({ 150, 470 });
+                    ImGui::ShadowText2(MemoryLogs.c_str(), ImColor(1.0f, 0.0f, 0.0f), ImColor(1.0f, 0.0f, 0.0f), 50.f, ImVec2((menu_size.x / 0.43 - ImGui::CalcTextSize(MemoryLogs.c_str()).x) * 0.1f, 470));
+                    //    ImGui::Text(MemoryLogs.c_str());
+                    ImGui::PopFont();;
+
+
+
+                    ImGui::SetCursorPos(ImVec2(12, 67));
+                    ImGui::BeginChild("Tabs", ImVec2(60, 530), false);
+
+
+
+                    ImGui::Tab("d", &iTabs, 0); //aim
+                   
+
+                        ImGui::Tab("c", &iTabs, 1); //chams
+                      
+                    
+                     //  ImGui::Tab("h", &iTabs, 3);
+                    
+                       ImGui::Tab("s", &iTabs, 4); //mem
+
+
+                        ImGui::Tab("2", &iTabs, 3);//setting
+
+                        
+
+                        ImGui::Tab("g", &iTabs, 2);//user
+
+                        
+
+                        ImGui::EndChild();
+
+
+
+
+                        if (iTabs == 0)
+                        {
+
+
+                            ImGui::SetCursorPos(ImVec2(85, 67));
+                            ImGui::BeginChild("AimHacks", ImVec2(300, 530), false);
+
+
+                  
+
+
+
+
+
+
+                            if (ImGui::Checkbox("Aimbot Head", &checkbox[3], "Apply in Every Match", &key1))
+
+                            {
+                                if (checkbox[3])
+                                {
+                                    std::thread taskThread([]()
+                                        {
+                                           
+                                        });
+                                    taskThread.detach();
+                                }
+                                else
+                                {
+
+                                }
+
+
+                            }
+
+                            if (GetAsyncKeyState(key1) & 0x1)
+                            {
+                                std::thread taskThread([]()
+                                    {
+                                        
+                                    });
+                                taskThread.detach();
+
+
+                            }
+                            
+                        
+                           
+
+
+
+
+                       
+                          
+
+                           
+
+
+
+
+
+
+
+                    
+                           
+                         
+                            
+
+
+
+                          
+
+
+
+                            ImGui::EndChild();
+
+
+                        }
+                        if (iTabs == 1)
+                        {
+
+
+
+                            ImGui::SetCursorPos(ImVec2(85, 67));
+                            ImGui::BeginChild("visuals", ImVec2(300, 530), false);
+
+
+
+                           
+
+                        
+                            
+
+
+                          
+
+                         
+
+                           
+                            
+                            
+
+                                
+                            
+
+
+
+
+                            ImGui::EndChild();
+
+
+
+                        }
+
+
+
+
+                        if (iTabs == 4)
+                        {
+                            ImGui::SetCursorPos(ImVec2(85, 67));
+                            ImGui::BeginChild("Misc", ImVec2(300, 530), false);
+
+                           
+
+                            ImGui::EndChild();
+
+
+                        }
+
+
+                        if (iTabs == 2)
+                        {
+
+
+
+                            ImGui::SetCursorPos(ImVec2(85, 67));
+                            ImGui::BeginChild("social", ImVec2(300, 530), false);
+
+
+                           
+
+                            
+                           
+
+
+
+                            if (ImGui::IsItemHovered())
+                            {
+                                ImGui::BeginTooltip();
+                                ImGui::Text("Change Panel's Theme");
+                                ImGui::EndTooltip();
+                            }
+
+                            ImGui::Spacing();
+                            ImGui::Spacing();
+                            ImGui::Separator();
+                            ImGui::Spacing();
+                            ImGui::Spacing();
+
+
+                            if (ImGui::Button("Youtube Handle", ImVec2(300, 35)))
+                            {
+//
+
+                                ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWNORMAL);
+//
+
+                            }
+
+                            if (ImGui::Button("Discord Handle", ImVec2(300, 35)))
+                            {
+
+
+                                ShellExecute(NULL, "open", " ", NULL, NULL, SW_SHOWNORMAL);
+
+
+                            }
+
+
+                            if (ImGui::Button("Fire Fire Amazon", ImVec2(300, 35)))
+                            {
+
+
+                                ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWNORMAL);
+
+
+                            }
+
+                            ImGui::EndChild();
+
+                        }
+                        if (iTabs == 3)
+                        {
+
+
+                            ImGui::SetCursorPos(ImVec2(85, 67));
+                            ImGui::BeginChild("misc", ImVec2(300, 530), false);
+
+
+                            if (ImGui::Checkbox("Streamer Mode", &checkbox[1], "Hide From Screenshare"))
+                            {
+                                if (checkbox[1])
+                                {
+
+                                    if (checkbox[1])
+                                    {
+                                        notificationSystem.Notification("Notification:", "Streamer Mode Activated", c::accent_color);
+                                        SetWindowDisplayAffinity(GetActiveWindow(), WDA_EXCLUDEFROMCAPTURE);
+                                        ITaskbarList* pTaskList = NULL;
+                                        HRESULT initRet = CoInitialize(NULL);
+                                        HRESULT createRet = CoCreateInstance(CLSID_TaskbarList,
+                                            NULL,
+                                            CLSCTX_INPROC_SERVER,
+                                            IID_ITaskbarList,
+                                            (LPVOID*)&pTaskList);
+
+                                        if (createRet == S_OK)
+                                        {
+
+                                            pTaskList->DeleteTab(GetActiveWindow());
+
+                                            pTaskList->Release();
+                                        }
+
+                                        CoUninitialize();
+                                    }
+                                    else
+                                    {
+                                        notificationSystem.Notification("Notification:", "Streamer Mode Removed", c::accent_color);
+                                        SetWindowDisplayAffinity(GetActiveWindow(), WDA_NONE);
+                                        ITaskbarList* pTaskList = NULL;
+                                        HRESULT initRet = CoInitialize(NULL);
+                                        HRESULT createRet = CoCreateInstance(CLSID_TaskbarList,
+                                            NULL,
+                                            CLSCTX_INPROC_SERVER,
+                                            IID_ITaskbarList,
+                                            (LPVOID*)&pTaskList);
+
+                                        if (createRet == S_OK)
+                                        {
+                                            pTaskList->AddTab(GetActiveWindow());
+
+                                            pTaskList->Release();
+                                        }
+
+                                        CoUninitialize();
+                                    }
+
+
+                                }
+                            }
+                           
+
+
+                            internet = ImGui::Checkbox("Stop Internet", &rafa::internet, "Apply at Login");
+
+                            if (internet) {
+                                if (rafa::internet) {
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In1\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In1\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In2\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In2\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In3\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_msi2\\HD-Player.exe\"", SW_HIDE); //Msi 4
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In3\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks_msi2\\HD-Player.exe\"", SW_HIDE);; //Msi 4
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In6\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5 xxx
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In6\" dir=out action=block program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE);; //Msi 5 xxx
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In4\" dir=in action=block program=\"%ProgramData%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In4\" dir=out action=block program=\"%ProgramData%\\Bluestacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In5\" dir=in action=block program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gaga
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In5\" dir=out action=block program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gaga
+
+                                    notificationSystem.Notification("Notification", "Desactivado Internet!", c::accent_color);
+
+
+
+
+                                }
+                                else {
+
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_msi2\\HD-Player.exe\"", SW_HIDE); //Msi 4
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5 xxx
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramData%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gag
+
+
+                                    notificationSystem.Notification("Notification", "Activado Internet!", c::accent_color);
+
+
+                                }
+                            }
+
+
+
+                            if (ImGui::Checkbox("Reset Guest", &checkbox[2], "Apply at Login"))
+
+                            {
+
+                                if (checkbox[2])
+                                {
+                                    std::thread taskThread([]()
+                                        {
+                                            
+
+                                        });
+                                    taskThread.detach();
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                          
+                            if (ImGui::ColorEdit3("Panel Theme", (float*)&main_color))
+                            {
+
+
+                                // Handle color change if needed
+                                notificationSystem.Notification("Color Changed", "Main Color Changed", c::accent_color);
+                            }
+
+
+                           
+
+                       
+                            
+
+
+
+                       
+
+                           
+
+
+                            
+                            if (GetAsyncKeyState(key2) & 0x1)
+                            {
+                                notificationSystem.Notification("Notification:", "Streamer Mode Removed", c::accent_color);
+                                SetWindowDisplayAffinity(GetActiveWindow(), WDA_NONE);
+                                ITaskbarList* pTaskList = NULL;
+                                HRESULT initRet = CoInitialize(NULL);
+                                HRESULT createRet = CoCreateInstance(CLSID_TaskbarList,
+                                    NULL,
+                                    CLSCTX_INPROC_SERVER,
+                                    IID_ITaskbarList,
+                                    (LPVOID*)&pTaskList);
+
+                                if (createRet == S_OK)
+                                {
+                                    pTaskList->AddTab(GetActiveWindow());
+
+                                    pTaskList->Release();
+                                }
+
+                                CoUninitialize();
+
+
+
+                            }
+
+                      
+
+                            
+
+                         
+
+                        
+                          
+
+                           
+
+                            
+
+
+
+                           /* if (internet) {
+                                if (rafa::internet) {
+                                    
+                                    
+                                    
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In1\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In1\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In2\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In2\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In3\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_msi2\\HD-Player.exe\"", SW_HIDE); //Msi 4
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In3\" dir=out action=block program=\"%ProgramFiles%\\Bluestacks_msi2\\HD-Player.exe\"", SW_HIDE);; //Msi 4
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In6\" dir=in action=block program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5 xxx
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In6\" dir=out action=block program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE);; //Msi 5 xxx
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In4\" dir=in action=block program=\"%ProgramData%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In4\" dir=out action=block program=\"%ProgramData%\\Bluestacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In5\" dir=in action=block program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gaga
+                                    WinExec("netsh advfirewall firewall add rule name=\"FF Block In5\" dir=out action=block program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gaga
+
+                                    notificationSystem.Notification("Notification", "Deactivate Internet!", c::accent_color);
+
+
+
+
+                                }
+                                else {
+                                
+
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_nxt\\HD-Player.exe\"", SW_HIDE); //Bluestacks 5
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks\\HD-Player.exe\"", SW_HIDE); //Bluestacks 4
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_msi2\\HD-Player.exe\"", SW_HIDE); //Msi 4
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5 xxx
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramData%\\BlueStacks_msi5\\HD-Player.exe\"", SW_HIDE); //Msi 5
+                                    WinExec("netsh advfirewall firewall delete rule name=all program=\"%ProgramFiles(x86)%\\SmartGaGa\\ProjectTitan\\Engine\\ProjectTitan.exe\"", SW_HIDE); //Smart Gag
+
+
+                                    notificationSystem.Notification("Notification", "Activate Internet!", c::accent_color);
+
+
+                                }
+                            }
+                            if (ImGui::IsItemHovered())
+                            {
+                                ImGui::BeginTooltip();
+                                ImGui::Text("Apply At Login");
+                                ImGui::EndTooltip();
+                            }*/
+                           
+                            
+                        
+
+                           
+
+                                
+
+                            ImGui::EndChild();
+
+
+
+                        }
+
+
+                    }
+                    else
+                    {
+                        draw->AddRectFilled(p, p + ImVec2(755, 50), background_color, 2.f, ImDrawFlags_RoundCornersTop);
+                        draw->AddRectFilled(p + ImVec2(0, 50), p + ImVec2(755, 52), second_color);
+
+                        draw->AddRectFilled(p, p + ImVec2(755, 550), background_color, 2.f, ImDrawFlags_RoundCornersTop);
+                        draw->AddRectFilled(p, p + ImVec2(755, 550), background_color, 2.f, ImDrawFlags_RoundCornersLeft);
+                        {
+
+                        if (!loader_animation)
+                            loader_animation = GetTickCount();
+                        if (GetTickCount() > loader_animation + (1 * 15))
+                        {
+                            
+                            if (text_animation_hide)
+                            {
+
+                                if (text_animation < 0.80f)
+                                    text_animation += 0.04f / ImGui::GetIO().Framerate * 60.f;
+                                if (text_animation >= 0.80f)
+                                    text_animation_hide = false;
+                            }
+
+                            else
+                            {
+                                if (text_animation > 0.00f)
+                                    text_animation -= 0.04f / ImGui::GetIO().Framerate * 60.f;
+                                if (text_animation <= 0.00f)
+                                    text_animation_hide = true;
+
+                            }
+                            loader_animation = 0;
+                        }
+                        const auto& CurrentWindowPos = ImGui::GetWindowPos();
+                        const auto& pWindowDrawList = ImGui::GetWindowDrawList();
+                        const auto& pForegroundDrawList = ImGui::GetForegroundDrawList();
+
+                        ImU32 tet_shadow = ImGui::ColorConvertFloat4ToU32(ImVec4(main_color));
+                        ImU32 tet_color = ImGui::ColorConvertFloat4ToU32(ImVec4(x_color));
+                        ImVec2 position(65, 25);
+
+                        ImGui::SetCursorPos(ImVec2((f::bg::size.x / 2) - 140 / 2 + position.x, (f::bg::size.y / 2) - 38 / 2 + position.y));
+                        ImGui::PushFont(bold_font);
+                        ImGui::ShadowText("SAGOR X ", ImGui::GetColorU32(tet_shadow), ImGui::GetColorU32(tet_shadow), 60.f, ImVec2((313 / 2 - (ImGui::CalcTextSize("SAGOR X ").x) / 2), 15));
+                        ImGui::PopFont();
+
+                        ImGui::SetCursorPos(ImVec2((f::bg::size.x / 2) - 140 / 2 + position.x, (f::bg::size.y / 2) - 38 / 2 + position.y));
+                        ImGui::PushFont(bold_font);
+                        ImGui::ShadowText("CHEAT'S", ImGui::GetColorU32(tet_color), ImGui::GetColorU32(tet_color), 60.f, ImVec2((597 / 2 - (ImGui::CalcTextSize("CHEAT'S").x) / 2), 15));
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(bold_font);
+                        ImVec4 animated_color = ImVec4(170, 0, 255, text_animation);
+                        
+                        ImGui::PopFont();
+
+                        
+//
+                       
+
+						
+
+                        ImGui::SetCursorPos(ImVec2(51, 120));
+                        ImGui::BeginChild("Inputs", ImVec2(500, 280), false, ImGuiWindowFlags_NoScrollbar);
+
+
+
+                        ImGui::InputTextEx("##0", "Username", login, 50, ImVec2(310, 45), ImGuiInputTextFlags_None);
+                        static bool showPassword = false;
+                        ImGuiInputTextFlags passwordFlags = showPassword ? ImGuiInputTextFlags_None : ImGuiInputTextFlags_Password;
+                        ImGui::InputTextEx("##1", "Password", password, 50, ImVec2(310, 45), passwordFlags);
+
+                        ImGui::InputTextEx("##2", "License", lisence, 50, ImVec2(310, 45), ImGuiInputTextFlags_None);
+
+                        ImGui::Checkbox11("Show Password", &showPassword);
+
+                            if (ImGui::Button("Login", ImVec2(310, 45)))
+                            {
+                               
+                                KeyAuthApp.login(login, password);
+                                if (KeyAuthApp.response.success)
+                                {
+
+                                    
+                                    menu_state = 1;
+                                    sndPlaySound("C:\\Windows\\0704.wav", SND_ASYNC | SND_FILENAME);
+
+									notificationSystem.Notification("Notification:", KeyAuthApp.response.message.c_str(), c::accent_color);
+									
+                                }
+                                else
+                                {
+                                    notificationSystem.Notification("Notification", KeyAuthApp.response.message.c_str(), c::accent_color);
+                                    
+                                }
+                            }
+                            if (ImGui::Button("Register", ImVec2(310, 45)))
+                            {
+                                KeyAuthApp.regstr(login, password, lisence);
+                                if (KeyAuthApp.response.success)
+                                {
+                                    sndPlaySound("C:\\Windows\\0704.wav", SND_ASYNC | SND_FILENAME);
+                                    notificationSystem.Notification("Notification:", KeyAuthApp.response.message.c_str(), c::accent_color);
+                                    menu_state = 1;
+                                    Beep(300, 400);
+                                }
+                                else
+                                {
+                                    notificationSystem.Notification("Notification:", KeyAuthApp.response.message.c_str(), c::accent_color);
+                                }
+                               
+
+                            }
+
+                        }ImGui::EndChild();
+                    }
+                    Trinage_background();
+                    notificationSystem.DrawNotification();
+            }
+                move_window();
+                ImGui::End();
+                RenderBlur(hwnd);
+        }
+
+            ImGui::Render();
+            const float clear_color_with_alpha[4] = { 0 };
+            g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
+            g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+            ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+            g_pSwapChain->Present(1, 0);
+    }
+
+        ImGui_ImplDX11_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+
+        CleanupDeviceD3D();
+        ::DestroyWindow(hwnd);
+        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+
+        return 0;
+}
+
+
